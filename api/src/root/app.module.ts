@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { AppConfigModule } from '../common/config/app-config.module.js';
 import { HealthModule } from '../core/health/health.module.js';
 import { LoggingModule } from '../common/logging/logging.module.js';
+import { ApiInterceptor } from '../common/api/interceptor/api.interceptor.js';
 
 @Module({})
 export class AppModule {
@@ -14,6 +15,9 @@ export class AppModule {
         LoggingModule,
         HealthModule,
       ],
+      providers: [
+      ApiInterceptor,
+ ],
     };
   }
 }

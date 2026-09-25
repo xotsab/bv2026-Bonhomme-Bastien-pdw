@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { HealthService } from './health.service.js';
-
+import { SkipApiTransform } from '../../common/api/decorator/skip-api-transform.decorator.js';
+@SkipApiTransform()
 @Controller('health')
 export class HealthController {
     constructor( private readonly healthService: HealthService) {
     }
     @Get('live')
-    getHello(): string {
-        return this.healthService.getHello();
+    getstatus(): string {
+        return this.healthService.getstatus();
     }
 }
