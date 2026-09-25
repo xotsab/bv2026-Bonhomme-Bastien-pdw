@@ -1,16 +1,15 @@
 import { z } from 'zod';
 import { LogLevel } from '../data/enum/log-level.enum.js';
 import { AppMode } from '../data/enum/app-mode.enum.js';
+import { DatabaseType } from '../data/enum/database-type.enum.js';
 
-
+const appModeSchema = z.nativeEnum(AppMode);
 
 const booleanFromStringSchema = z
   .enum(['true', 'false'])
   .transform((value) => value === 'true');
 
 const nonEmptyStringSchema = z.string().trim().min(1);
-
-const appModeSchema = z.nativeEnum(AppMode);
 
 const corsOriginsSchema = z
   .string()
@@ -20,18 +19,48 @@ const corsOriginsSchema = z
       .map((origin) => origin.trim())
       .filter(Boolean),
   );
+
 const environmentSchema = z
   .object({
     NODE_ENV: appModeSchema,
     APP_NAME: nonEmptyStringSchema,
     APP_PORT: z.coerce.number().int().min(1).max(65535),
+    APP_BASE_URL: nonEmptyStringSchema.regex(/^[a-zA-Z0-9][a-zA-Z0-9/_-]*$/).transform((value) => value.replace(/^\/+|\/+$/g, '')),
     APP_CORS_ORIGIN: corsOriginsSchema,
+    APP_TRUST_PROXY: booleanFromStringSchema,
+    APP_HTTP_PAYLOAD_ERROR_CODE: z.coerce.number().int().min(400).max(499),
     LOG_LEVEL: z.nativeEnum(LogLevel),
+    SWAGGER_ENABLED: booleanFromStringSchema,
+    SWAGGER_TITLE: nonEmptyStringSchema,
+    SWAGGER_DESCRIPTION: nonEmptyStringSchema,
+    SWAGGER_VERSION: nonEmptyStringSchema,
+    SWAGGER_PATH: nonEmptyStringSchema.regex(/^[a-zA-Z0-9][a-zA-Z0-9/_-]*$/).transform((value) => value.replace(/^\/+|\/+$/g, '')),
+    DB_TYPE: z.nativeEnum(DatabaseType),
+    DB_HOST: nonEmptyStringSchema,
+    DB_PORT: z.coerce.number().int().min(1).max(65535),
+    DB_USER: nonEmptyStringSchema,
+    DB_PASSWORD: nonEmptyStringSchema,
+    DB_DATABASE: nonEmptyStringSchema,
     DB_SYNC: booleanFromStringSchema,
+    DB_MIGRATION: booleanFromStringSchema,
+    DB_LOG: booleanFromStringSchema,
+    DB_SCHEMA: z.string().regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/).default('public'),
     AUTH_PASSWORD_MIN_LENGTH: z.coerce.number().int().min(1).default(15),
-    AUTH_REFRESH_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1),
-    AUTH_SESSION_ABSOLUTE_TTL_SECONDS: z.coerce.number().int().min(1),
-    // ...environ 40 variables
+    AUTH_PASSWORD_MAX_LENGTH: z.coerce.number().int().min(64).max(1024).default(128),
+    AUTH_PASSWORD_ARGON2_MEMORY_COST: z.coerce.number().int().min(19456).default(19456),
+    AUTH_PASSWORD_ARGON2_TIME_COST: z.coerce.number().int().min(2).default(2),
+    AUTH_PASSWORD_ARGON2_PARALLELISM: z.coerce.number().int().min(1).default(1),
+    AUTH_PASSWORD_MAX_ATTEMPTS: z.coerce.number().int().min(1).max(100).default(5),
+    AUTH_PASSWORD_LOCKOUT_SECONDS: z.coerce.number().int().min(1).default(900),
+    AUTH_ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1).max(600).default(600),
+    AUTH_REFRESH_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1).default(604800),
+    AUTH_SESSION_ABSOLUTE_TTL_SECONDS: z.coerce.number().int().min(1).default(2592000),
+    AUTH_REFRESH_TOKEN_PEPPER: z.string().default(''),
+    AUTH_JWT_ACTIVE_KID: z.string().default('dev-active'),
+    AUTH_JWT_PRIVATE_KEY_BASE64: z.string().default(''),
+    AUTH_JWT_PUBLIC_KEYS_JSON: z.string().default('{}'),
+    AUTH_TEST_REFRESH_FAILURE_POINT: z.enum([ '', 'after-successor-persistence', 'after-consumed','during-session-revocation','during-family-revocation',]).default(''),
+
   })
 
   .superRefine((environment, context) => {

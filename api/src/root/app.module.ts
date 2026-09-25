@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { AppConfigModule } from '../common/config/app-config.module.js';
 import { HealthModule } from '../core/health/health.module.js';
+import { LoggingModule } from '../common/logging/logging.module.js';
 
 @Module({})
 export class AppModule {
@@ -10,6 +11,7 @@ export class AppModule {
       module: AppModule,
       imports: [
         AppConfigModule.register(),
+        LoggingModule,
         HealthModule,
       ],
     };
