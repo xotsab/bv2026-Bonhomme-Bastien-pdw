@@ -29,6 +29,9 @@ constructor(private readonly configService: ConfigService<ValidatedEnvironment,t
   get isTest(): boolean {
     return this.appMode === AppMode.Test;
   }
+  get httpPayloadErrorStatusCode(): number {
+    return this.get(ConfigKey.AppHttpPayloadErrorCode);
+  }
 
   get<TConfigKey extends ConfigKey>(key: TConfigKey,): ValidatedEnvironment[TConfigKey & keyof ValidatedEnvironment] {
     return this.configService.getOrThrow(key, {infer: true,});
