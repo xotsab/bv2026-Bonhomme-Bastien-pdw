@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ApiCodeResponse } from '../enum/api-code-response.enum.js';
 import { ApiValidationError } from '../model/api-validation-error.js';
 import { ValidationError } from 'class-validator';
-import { ApiException } from './index.js';
+import { ApiException } from './api-exception.js';
 
 export class ValidationException extends ApiException<null> {
  constructor(
