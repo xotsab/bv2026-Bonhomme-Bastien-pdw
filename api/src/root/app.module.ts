@@ -8,6 +8,7 @@ import { ApplicationLifecycleLogger } from '../common/logging/application-lifecy
 import { LoggingModule } from '../common/logging/logging.module.js';
 import { HealthModule } from '../core/health/health.module.js';
 import { AccountModule } from '../core/account/account.module.js';
+import { AuthModule } from '../core/auth/auth.module.js';
 
 @Module({})
 export class AppModule {
@@ -20,6 +21,7 @@ export class AppModule {
         DatabaseModule,
         HealthModule,
         AccountModule,
+        AuthModule,
       ],
       providers: [
         ApiInterceptor,
