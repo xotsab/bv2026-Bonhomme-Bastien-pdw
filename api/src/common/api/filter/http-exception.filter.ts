@@ -34,7 +34,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private getStatusCode(exception: unknown): HttpStatus {
-    // ApiException hérite de HttpException : un seul test couvre les deux.
     if (exception instanceof HttpException) {
       return exception.getStatus();
     }
@@ -64,7 +63,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
   ): void {
     const requestId = typeof request.id === 'string' ? request.id : undefined;
     const exceptionName =
-      exception instanceof Error ? exception.constructor.name : typeof exception;
+      exception instanceof Error
+        ? exception.constructor.name
+        : typeof exception;
 
     const context = {
       category: LogCategory.Error,

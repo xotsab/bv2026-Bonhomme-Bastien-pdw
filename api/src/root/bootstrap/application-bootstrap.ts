@@ -1,4 +1,8 @@
-import { INestApplication, RequestMethod, ValidationPipe } from '@nestjs/common';
+import {
+  INestApplication,
+  RequestMethod,
+  ValidationPipe,
+} from '@nestjs/common';
 
 import { ValidationException } from '../../common/api/data/exception/validation-exception.js';
 import { HttpExceptionFilter } from '../../common/api/filter/http-exception.filter.js';
@@ -6,8 +10,6 @@ import { ApiInterceptor } from '../../common/api/interceptor/api.interceptor.js'
 import { setupSwagger } from '../../common/api/swagger/setup-swagger.js';
 import { EnvService } from '../../common/config/env.service.js';
 
-// v1 (thème 5) : préfixe global, ValidationPipe, Filter, Interceptor, Swagger.
-// helmet, CORS, cookie-parser et trust proxy arrivent au thème 13 (v3).
 export const configureApplication = (app: INestApplication): void => {
   const envService = app.get(EnvService);
 

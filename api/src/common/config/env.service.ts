@@ -13,7 +13,6 @@ export class EnvService {
     private readonly configService: ConfigService<ValidatedEnvironment, true>,
   ) {}
 
-  // --- Application / HTTP / logs / Swagger ---
   get appMode(): AppMode {
     return this.get(ConfigKey.NodeEnv);
   }
@@ -66,7 +65,6 @@ export class EnvService {
     return this.get(ConfigKey.SwaggerPath);
   }
 
-  // --- Base de données (utilisés au thème 6) ---
   get databaseType(): DatabaseType {
     return this.get(ConfigKey.DbType);
   }
@@ -107,7 +105,6 @@ export class EnvService {
     return this.get(ConfigKey.DbSchema);
   }
 
-  // --- Sécurité (utilisés à partir du thème 9) ---
   get passwordMinLength(): number {
     return this.get(ConfigKey.AuthPasswordMinLength);
   }
@@ -168,7 +165,6 @@ export class EnvService {
     return this.get(ConfigKey.AuthTestRefreshFailurePoint);
   }
 
-  // --- Propriétés dérivées ---
   get isProduction(): boolean {
     return this.appMode === AppMode.Prod;
   }

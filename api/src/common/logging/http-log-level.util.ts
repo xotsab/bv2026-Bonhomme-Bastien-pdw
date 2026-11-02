@@ -1,9 +1,6 @@
-import { HttpLogLevel } from './data/enum/http-log-level.type.js';
+export type HttpLogLevel = 'info' | 'warn' | 'error' | 'silent';
 
-const HEALTH_CHECK_LOG_PATHS = new Set([
-  '/health/live',
-  '/health/ready',
-]);
+const HEALTH_CHECK_LOG_PATHS = new Set(['/health/live', '/health/ready']);
 
 export const resolveHttpLogLevel = (
   path: string | undefined,
