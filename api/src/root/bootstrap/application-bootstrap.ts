@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import {
   INestApplication,
   RequestMethod,
@@ -12,6 +13,8 @@ import { EnvService } from '../../common/config/env.service.js';
 
 export const configureApplication = (app: INestApplication): void => {
   const envService = app.get(EnvService);
+
+  app.use(cookieParser());
 
   app.setGlobalPrefix(envService.appBaseUrl, {
     exclude: [

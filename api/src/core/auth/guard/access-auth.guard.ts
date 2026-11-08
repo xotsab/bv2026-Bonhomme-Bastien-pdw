@@ -1,0 +1,66 @@
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Request } from 'express';
+
+import { AuthCookieService } from '../service/auth-cookie.service.js';
+import { AuthSessionService } from '../service/auth-session.service.js';
+import { CsrfService } from '../service/csrf.service.js';
+import { TokenCryptoService } from '../service/token-crypto.service.js';
+import { AuthContext } from '../data/model/auth-context.js';
+import { PUBLIC_ROUTE } from '../decorator/public.decorator.js';
+import { AuthSecurityException } from '../data/exception/auth-security.exception.js';
+import { EnvService } from '../../../common/config/index.js';
+
+type AuthRequest = Request & { auth?: AuthContext };
+
+@Injectable()
+export class AccessAuthGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly cookies: AuthCookieService,
+    private readonly tokenCrypto: TokenCryptoService,
+    private readonly sessions: AuthSessionService,
+    private readonly csrf: CsrfService,
+    private readonly envService: EnvService,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(PUBLIC_ROUTE, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) {
+      return true;
+    }
+
+    const request = context.switchToHttp().getRequest<AuthRequest>();
+    if (
+      request.path === `/${this.envService.swaggerPath}` ||
+      request.path.startsWith(`/${this.envService.swaggerPath}/`)
+    ) {
+      return true;
+    }
+    const cookies = request.cookies as Record<string, unknown> | undefined;
+    const token = cookies?.[this.cookies.names.access];
+    if (typeof token !== 'string') {
+      throw new AuthSecurityException();
+    }
+
+    const claims = this.tokenCrypto.verifyAccessToken(token);
+    const auth: AuthContext = {
+      accountId: claims.sub,
+      sessionId: claims.sid,
+      tokenId: claims.jti,
+    };
+    const session = await this.sessions.verifyContext(auth);
+    if (session.accessVersion !== claims.ver) {
+      throw new AuthSecurityException();
+    }
+
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
+      this.csrf.assertValid(request, session);
+    }
+    request.auth = auth;
+    return true;
+  }
+}
